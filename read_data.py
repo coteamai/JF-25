@@ -47,7 +47,7 @@ def read_ddsm_dicom_info(mode:Literal["train","test"]="train"):
             directories[path_name].extend([name_crop[5:],id])
     return list(directories.values())
     
-def read_bboxes(directory,resize_mask=False):
+def read_bboxes(directory,resize_mask=False,xyxy=True):
     roi,img=directory
     mask = cv2.imread(roi, cv2.IMREAD_GRAYSCALE)
     if resize_mask:
@@ -61,7 +61,12 @@ def read_bboxes(directory,resize_mask=False):
         x_s=contour[:, 0]
         y_s=contour[:, 1]
         x_s, y_s = x_s/mask.shape[1], y_s/mask.shape[0]
-        bbox=(x_s.mean(), y_s.mean(), x_s.max() - x_s.min(), y_s.max() - y_s.min())
+        bbox=[x_s.mean(), y_s.mean(), x_s.max() - x_s.min(), y_s.max() - y_s.min()]
+        bbox[0]=bbox[0]-bbox[2]/2
+        bbox[1]=bbox[1]-bbox[3]/2
+        if xyxy:
+            bbox[2]=bbox[0]+bbox[2]
+            bbox[3]=bbox[1]+bbox[3]
         bboxes.append(bbox)
     return bboxes
 def process_directory(directory:Tuple[str,str,str]):
@@ -80,10 +85,12 @@ def process_directory(directory:Tuple[str,str,str]):
     img=clahe.apply(img)
     img=cv2.cvtColor(img,cv2.COLOR_GRAY2RGB)
     img=np.asarray(img)
+
     return img,(bboxes,assesment_score)
 if __name__=="__main__":
-    direct=read_ddsm_dicom_info()[0]
-    process_directory(direct)
+    direct=read_ddsm_dicom_info()[1]
+    bboxes=read_bboxes((direct[0],direct[1]))
+    plot_mammography(direct[1],direct[0],bboxes,resize_mask=True)
     
     #length=[]
     #for direc in read_ddsm_dicom_info(mode="train"):

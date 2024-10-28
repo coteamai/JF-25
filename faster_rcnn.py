@@ -29,14 +29,21 @@ def get_detection_model_rcnn(layers=LAYERS, in_channels=IN_CHANNELS, out_channel
         backbone=backbone,
         num_classes=5,
         rpn_anchor_generator=anchor_generator,
-        box_roi_pool=roi_pooler
+        box_roi_pool=roi_pooler,
     )
     
     return model
 
 
 if __name__=="__main__":
-    model = get_detection_model_rcnn().eval()
-    dummy_input = torch.rand(1, 3, 512, 512)
-    output = model(dummy_input)
+    model = get_detection_model_rcnn().train()
+    dummy_input = torch.rand(3, 512, 512)  # Changed input to [C, H, W] format
+    target = [{
+        'boxes': torch.tensor([
+            [100.0, 150.0, 400.0, 450.0],  # Example bounding box 1
+            [200.0, 300.0, 350.0, 400.0]   # Example bounding box 2
+        ], dtype=torch.float32),
+        'labels': torch.tensor([1, 2], dtype=torch.int64)  # Class labels for each box
+    }]
+    output = model([dummy_input], target)
     print(output)
