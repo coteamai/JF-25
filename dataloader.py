@@ -25,6 +25,7 @@ def collate_fn(batch):
         x=img.size(0)
         y=img.size(1)
         img=F.pad(img,pad=(0,MAX_Y-y,0,MAX_X-x),value=0)
+        img=img.permute(2,0,1)
         imgs.append(img)
         bbox=sample[1][0]
         bbox=torch.tensor(bbox,dtype=torch.float32)
@@ -34,7 +35,7 @@ def collate_fn(batch):
     imgs=torch.stack(imgs)/255
     bboxes=torch.stack(bboxes)
     birads=torch.tensor(birads,dtype=torch.int64)
-    birads=F.one_hot(birads,num_classes=6)
+    birads=F.one_hot(birads,num_classes=6).to(torch.int32)
     return imgs,(bboxes,birads)
 if __name__=="__main__":
     ds=DDSM_DATASET()

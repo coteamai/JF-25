@@ -1,6 +1,6 @@
 import pandas as pd
 from hyperparams import ddsm_dicom,calc_train,mass_train
-from utils import plot_ddsm
+from utils import plot_mammography
 from pathlib import Path
 import os
 import re
@@ -78,15 +78,19 @@ def process_directory(directory:Tuple[str,str,str]):
     img=cv2.imread(img, cv2.IMREAD_GRAYSCALE)
     clahe=cv2.createCLAHE(clipLimit=50)
     img=clahe.apply(img)
+    img=cv2.cvtColor(img,cv2.COLOR_GRAY2RGB)
     img=np.asarray(img)
     return img,(bboxes,assesment_score)
 if __name__=="__main__":
-    length=[]
-    for direc in read_ddsm_dicom_info(mode="train"):
-        _,(bbox,_)=process_directory(direc)
-        length.append(len(bbox))
-    print(length)
-    print(max(length))
+    direct=read_ddsm_dicom_info()[0]
+    process_directory(direct)
+    
+    #length=[]
+    #for direc in read_ddsm_dicom_info(mode="train"):
+    #    _,(bbox,_)=process_directory(direc)
+    #    length.append(len(bbox))
+    #print(length)
+    #print(max(length))
     #plot_ddsm()
     #x_sizes=[]
     #y_sizes=[]
