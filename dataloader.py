@@ -58,7 +58,7 @@ def collate_fn_2(batch):
         bboxes.append(bbox)
         birads.append(sample[1][1])
     birads = torch.tensor(birads, dtype=torch.int64)
-    birads = F.one_hot(birads, num_classes=6).to(torch.int32)
+    birads = F.one_hot(birads, num_classes=6).to(torch.int64)
     return imgs, (bboxes, birads)
 
 

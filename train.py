@@ -41,9 +41,8 @@ def main():
                 } for boxes, labels in zip(bboxes, birads)
             ]
             print(targets)
-
-            optimizer.zero_grad()
             loss_dict = model(imgs, targets)
+            optimizer.zero_grad()
             losses = sum(loss for loss in loss_dict.values())
             epoch_losses.append(losses.item())
 
